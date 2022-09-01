@@ -1,0 +1,50 @@
+version:  '3.3'
+
+services:
+
+  nginx:
+    image: nginx:1.21-alpine
+    restart: on-failure
+    volumes:
+      - './docker/nginx/conf.d:/etc/nginx/conf.d:ro'
+      - './docker/nginx/certs:/etc/nginx/certs:ro'
+    ports:
+      - "443:443"
+
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - '.:/app'
+    restart: on-failure
+    environment:
+      - 'COMPOSER_HOME=/tmp/composer'
+      - 'COMPOSER_ALLOW_SUPERUSER=1'
+      - 'XDEBUG_MODE=develop,debug'
+    user: "${DOCKER_USER_ID:-1000}:${DOCKER_GROUP_ID:-1000}"
+    depends_on:
+      - database
+
+  worker:
+    build:
+      context: ./docker/php
+    volumes:
+      - '.:/app'
+    restart: always
+    user: "${DOCKER_USER_ID:-1000}:${DOCKER_GROUP_ID:-1000}"
+    depends_on:
+      - database
+    command: sh -c 'sleep 5 && php bin/console messenger:consume async -vv'
+
+  database:
+    image: mariadb:10.4.14
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: audioteka-assignment
+
+volumes:
+  db-data:

@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        default_connection: default
+        url: 'sqlite:///:memory:'
