@@ -1,5 +1,9 @@
 # Audioteka: zadanie rekrutacyjne
 
+## Rozwiązanie
+
+Rozwiązanie znajduje się w branchu "rozwiazanie". Postaram się zostawić pull requesta, tak aby było widać dobrze diffa.
+
 ## Instalacja
 
 Do uruchomienia wymagany jest `docker` i `docker-compose`
