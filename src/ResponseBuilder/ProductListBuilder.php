@@ -34,7 +34,8 @@ class ProductListBuilder
             $data['products'][] = [
                 'id' => $product->getId(),
                 'name' => $product->getName(),
-                'price' => $product->getPrice()
+                'price' => $product->getPrice(),
+                'created' => $product->getCreated()
             ];
         }
 
