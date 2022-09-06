@@ -1,0 +1,296 @@
+{
+	"info": {
+		"_postman_id": "a6d61875-4e20-4688-a29e-97fc90a0603d",
+		"name": "Audioteka",
+		"description": "Zmienna ID w kolekcji jest nadawana dynamicznie w requestach z delete",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/products",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/products?name=asd8&price=11",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "asd8"
+								},
+								{
+									"key": "price",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest('https://localhost/products', (error, response) => {\r",
+									"  if (error) {\r",
+									"    console.log(error);\r",
+									"  } else {\r",
+									"    pm.collectionVariables.set(\"id\", response.json().products[0].id);\r",
+									"  }\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/products/{{id}}",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"products",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "edit",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest('https://localhost/products', (error, response) => {\r",
+									"  if (error) {\r",
+									"    console.log(error);\r",
+									"  } else {\r",
+									"    pm.collectionVariables.set(\"id\", response.json().products[0].id);\r",
+									"  }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/products/{{id}}?name=asd8editeddd&price=11",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"products",
+								"{{id}}"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "asd8editeddd"
+								},
+								{
+									"key": "price",
+									"value": "11"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/cart",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"cart"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/cart/{{cart}}",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"cart",
+								"{{cart}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "remove product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.sendRequest('https://localhost/cart/'+pm.collectionVariables.get('cart'), (error, response) => {\r",
+									"  if (error) {\r",
+									"    console.log(error);\r",
+									"  } else {\r",
+									"    pm.collectionVariables.set(\"id\", response.json().products[0].id);\r",
+									"  }\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/cart/{{cart}}/{{id}}",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"cart",
+								"{{cart}}",
+								"{{id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add product",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// add few more products to replicate bug.\r",
+									"const array1 = [ \r",
+									"    '52efbb25-3bd7-42b1-9803-9628f7622454',\r",
+									"    '3750aba4-7f14-42b0-851a-ea2caa0c5bf2', \r",
+									"    'dcf56c87-265c-41d1-b8d9-34f0bbeee14b',\r",
+									"    'de4baa87-ed7c-4147-ab76-b684bee13df7'];\r",
+									"\r",
+									"array1.forEach(element => {\r",
+									"    pm.sendRequest({\r",
+									"    url: 'https://localhost/cart/'+pm.collectionVariables.get('cart')+'/'+element,\r",
+									"    method: 'PUT'\r",
+									"});\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{server}}/cart/{{cart}}/6db5a50a-796e-495b-8fac-442fc7941d95",
+							"host": [
+								"{{server}}"
+							],
+							"path": [
+								"cart",
+								"{{cart}}",
+								"6db5a50a-796e-495b-8fac-442fc7941d95"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "server",
+			"value": "https://localhost"
+		},
+		{
+			"key": "id",
+			"value": ""
+		},
+		{
+			"key": "cart",
+			"value": "5acc8e2d-f36d-4a07-8670-bbd3c2d2c9c1"
+		}
+	]
+}

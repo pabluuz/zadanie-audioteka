@@ -2,12 +2,17 @@
 
 namespace App\Entity;
 
+use App\Service\Catalog\Product as ProductInterface;
+use DateTimeImmutable;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 #[ORM\Entity]
-class Product implements \App\Service\Catalog\Product
+#[ORM\HasLifecycleCallbacks]
+class Product implements ProductInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', nullable: false)]
@@ -17,13 +22,17 @@ class Product implements \App\Service\Catalog\Product
     private string $name;
 
     #[ORM\Column(type: 'integer', nullable: false)]
-    private string $priceAmount;
+    private string $price;
+
+    #[Gedmo\Timestampable(on: "create")]
+    #[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
+    private DateTimeImmutable $created;
 
     public function __construct(string $id, string $name, int $price)
     {
         $this->id = Uuid::fromString($id);
         $this->name = $name;
-        $this->priceAmount = $price;
+        $this->price = $price;
     }
 
     public function getId(): string
@@ -36,8 +45,23 @@ class Product implements \App\Service\Catalog\Product
         return $this->name;
     }
 
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
     public function getPrice(): int
     {
-        return $this->priceAmount;
+        return $this->price;
+    }
+
+    public function setPrice(string $price): void
+    {
+        $this->price = $price;
+    }
+
+    public function getCreated(): DateTimeImmutable
+    {
+        return $this->created;
     }
 }

@@ -37,14 +37,11 @@ class ProductListBuilderTest extends TestCase
         ], $this->builder->__invoke([], 0, 3, 0));
     }
 
-    public function test_builds_first_page(): void
+    /**
+     * @dataProvider products_provider
+     */
+    public function test_builds_first_page($products): void
     {
-        $products = [
-            new Product('25cc9f5d-7702-4cb0-b6fc-f93b049055ca', 'Product 1', 1200),
-            new Product('30e4e028-3b38-4cb9-9267-a9e515983337', 'Product 2', 1400),
-            new Product('f6635017-982f-4544-9ac5-3d57107c0f0d', 'Product 3', 1500),
-        ];
-
         $this->assertEquals([
             'previous_page' => null,
             'next_page' => 'product-list{"page":1}',
@@ -57,14 +54,11 @@ class ProductListBuilderTest extends TestCase
         ], $this->builder->__invoke($products, 0, 3, 5));
     }
 
-    public function test_builds_last_page(): void
+    /**
+     * @dataProvider products_provider
+     */
+    public function test_builds_last_page($products): void
     {
-        $products = [
-            new Product('25cc9f5d-7702-4cb0-b6fc-f93b049055ca', 'Product 1', 1200),
-            new Product('30e4e028-3b38-4cb9-9267-a9e515983337', 'Product 2', 1400),
-            new Product('f6635017-982f-4544-9ac5-3d57107c0f0d', 'Product 3', 1500),
-        ];
-
         $this->assertEquals([
             'previous_page' => 'product-list{"page":0}',
             'next_page' => null,
@@ -77,14 +71,11 @@ class ProductListBuilderTest extends TestCase
         ], $this->builder->__invoke($products, 1, 3, 5));
     }
 
-    public function test_builds_middle_page(): void
+    /**
+     * @dataProvider products_provider
+     */
+    public function test_builds_middle_page($products): void
     {
-        $products = [
-            new Product('25cc9f5d-7702-4cb0-b6fc-f93b049055ca', 'Product 1', 1200),
-            new Product('30e4e028-3b38-4cb9-9267-a9e515983337', 'Product 2', 1400),
-            new Product('f6635017-982f-4544-9ac5-3d57107c0f0d', 'Product 3', 1500),
-        ];
-
         $this->assertEquals([
             'previous_page' => 'product-list{"page":0}',
             'next_page' => 'product-list{"page":2}',
@@ -95,5 +86,25 @@ class ProductListBuilderTest extends TestCase
                 ['id' => 'f6635017-982f-4544-9ac5-3d57107c0f0d', 'name' => 'Product 3', 'price' => 1500],
             ],
         ], $this->builder->__invoke($products, 1, 3, 7));
+    }
+
+    public function products_provider()
+    {
+        $productsData = [
+            ['id' => '25cc9f5d-7702-4cb0-b6fc-f93b049055ca', 'name' => 'Product 1', 'price' => 1200],
+            ['id' => '30e4e028-3b38-4cb9-9267-a9e515983337', 'name' => 'Product 2', 'price' => 1400],
+            ['id' => 'f6635017-982f-4544-9ac5-3d57107c0f0d', 'name' => 'Product 3', 'price' => 1500]
+        ];
+        $products = [];
+
+        foreach ($productsData as $productsDatum) {
+            $productMock = $this->createMock(Product::class);
+            $productMock->method('getId')->willReturn($productsDatum['id']);
+            $productMock->method('getName')->willReturn($productsDatum['name']);
+            $productMock->method('getPrice')->willReturn($productsDatum['price']);
+            $productMock->method('getCreated')->willReturn(new \DateTimeImmutable());
+            $products[] = $productMock;
+        }
+        yield [$products];
     }
 }
